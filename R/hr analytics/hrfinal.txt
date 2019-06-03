@@ -1,0 +1,91 @@
+#________________________________IMPORTING THE DATA______________________
+
+train<-read.csv("C:\\Users\\Vishnu\\Desktop\\case study\\HR ANALYTICS\\train.csv",header=T,sep=",",na.strings=c(""))
+test<-read.csv("C:\\Users\\Vishnu\\Desktop\\case study\\HR ANALYTICS\\test.csv",header=T,sep=",",na.strings=c(""))
+summary(train)
+str(train)
+
+#_______________data type changing___________
+train$KPIs_met..80.<-as.factor(train$KPIs_met..80.)
+test$KPIs_met..80.<-as.factor(test$KPIs_met..80.)
+train$awards_won.<-as.factor(train$awards_won.)
+test$awards_won.<-as.factor(test$awards_won.)
+train$is_promoted<-as.factor(train$is_promoted)
+train$previous_year_rating<-as.factor(train$previous_year_rating)
+test$previous_year_rating<-as.factor(test$previous_year_rating)
+train$education<-as.factor(train$education)
+test$education<-as.factor(test$education)
+
+#___________missing values_________
+
+names(train)
+train$education<-ifelse(is.na(train$education),"1",train$education)
+sum(is.na(train$education))
+train$previous_year_rating<-ifelse(is.na(train$previous_year_rating),"3",train$previous_year_rating)
+sum(is.na(train$previous_year_rating))
+
+#__________imploratory data analysis_______________
+
+table(train$department)
+table(train$region)
+mean(train$age[train$department=="Analytics"])
+mean(train$age[train$department=="Operations"])
+mean(train$age[train$department=="Technology"])
+table(train$department,train$awards_won.)
+
+#__________various analysis___________
+boxplot(train$no_of_trainings)
+
+#____________model______________
+
+names(train)
+x<-c("department", "region", "education","gender","recruitment_channel", "no_of_trainings","age","previous_year_rating",
+     "length_of_service", "KPIs_met..80.","awards_won.","avg_training_score")
+y<-c("is_promoted")
+
+model<-glm(is_promoted~department+region+education+gender+recruitment_channel+no_of_trainings+age+previous_year_rating+length_of_service+KPIs_met..80.+awards_won.+avg_training_score,family="binomial",data=train)
+model
+train$preds<-predict(model,train,type="response")
+train$preds<-ifelse(train$preds<=0.50,0,1)
+table(train$is_promoted,train$preds)
+
+#_________decsion tree____________-
+
+png(file="decision_tree.png")
+model_tree<-ctree(is_promoted~department+region+education+gender+recruitment_channel+no_of_trainings+age+previous_year_rating+length_of_service+KPIs_met..80.+awards_won.+avg_training_score,data=train)
+plot(model_tree)
+dev.off()
+summary(model_tree)
+model_tree
+train$preds_dt<-predict(model_tree,train,type="response")
+table(train$is_promoted,train$preds_dt)
+
+#_____________random forest________
+
+model_rf<-randomForest(is_promoted~department+region+education+gender+recruitment_channel+no_of_trainings+age+previous_year_rating+length_of_service+KPIs_met..80.+awards_won.+avg_training_score,data=train)
+summary(model_rf)
+train$preds_rf<-predict(model_rf,train,type="response")
+table(train$is_promoted,train$preds_rf)
+
+#_____________svm__________________
+
+model_svm<-svm(is_promoted~department+region+education+gender+recruitment_channel+no_of_trainings+age+previous_year_rating+length_of_service+KPIs_met..80.+awards_won.+avg_training_score,data=train)
+summary(model_svm)
+train$preds_svm<-predict(model_svm,traintype="response")
+table(train$is_promoted,train$preds_svm)
+
+#_____________test____________
+str(test)
+summary(test)
+test$education<-ifelse(is.na(test$education),"1",test$education)
+sum(is.na(test$education))
+test$previous_year_rating<-ifelse(is.na(test$previous_year_rating),"3",test$previous_year_rating)
+sum(is.na(test$previous_year_rating))
+str(test)
+
+#____________test prediction__________
+
+test$preds<-predict(model_rf,test,type = "response")
+
+write.csv(test,"finalpredshrana.csv")
+getwd()

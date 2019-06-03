@@ -1,0 +1,40 @@
+mystring = 'this is test'
+print(mystring)
+len(mystring)
+mystring[0]
+mystring[1]
+mystring[5:6]
+mystring[:7]
+mystring[4:]
+mystring[-6]
+example= mystring[5:]
+
+
+#######tuples##############
+mytuple = (11,12,13)
+mytuple[1]
+mytuple += (44,)
+import numpy as np
+np.mean(mytuple)
+np.median(mytuple)
+atuple=sorted(mytuple)
+newtuple= tuple('this is my text')
+
+
+def area_volume_of_cube (sidelength):
+    area = 6*sidelength*sidelength
+    volume = sidelength*sidelength*sidelength
+    return area, volume
+
+area_volume_of_cube(6)
+
+
+def simple_intrest (principle,years,rate):
+    si=(principle*years*rate)/100
+    return si
+simple_intrest(100,1,.1)
+    
+def compound_intrest (principle,years,rate):
+    ci= principle*(pow((1+rate/100),years))
+    return ci
+compound_intrest(100,1,.1)
